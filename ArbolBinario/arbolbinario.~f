@@ -1,0 +1,121 @@
+      program arbolbinario
+      implicit none
+      integer, parameter :: MAXN=100
+      integer :: key(MAXN), left(MAXN), right(MAXN)
+      integer :: n, i, x, root, sz
+      do i=1,MAXN
+         left(i)=0
+         right(i)=0
+      enddo
+      root=0
+      sz=0
+      print *, 'Numero de nodos:'
+      read(*,*) n
+      print *, 'Nodos a insertar:'
+      do i=1,n
+         read(*,*) x
+         call insert_bst(x, root, key, left, right, sz)
+      enddo
+      call print_pre(root, key, left, right)
+      call print_in(root, key, left, right)
+      call print_post(root, key, left, right)
+      print *, 'Presiona Enter para salir...'
+      read(*,*)
+      stop
+      contains
+      subroutine insert_bst(x, root, key, left, right, sz)
+        integer x, root, key(*), left(*), right(*), sz
+        integer cur, parent
+        if (root .eq. 0) then
+          sz = sz + 1
+          key(sz)=x
+          left(sz)=0
+          right(sz)=0
+          root = sz
+          return
+        endif
+        parent = 0
+        cur = root
+ 10     continue
+        if (cur .ne. 0) then
+          parent = cur
+          if (x .lt. key(cur)) then
+            cur = left(cur)
+          else
+            cur = right(cur)
+          endif
+          goto 10
+        endif
+        sz = sz + 1
+        key(sz)=x
+        left(sz)=0
+        right(sz)=0
+        if (x .lt. key(parent)) then
+          left(parent)=sz
+        else
+          right(parent)=sz
+        endif
+      end subroutine
+      subroutine print_pre(root, key, left, right)
+        integer root, key(*), left(*), right(*)
+        integer stack(200), top, v
+        write(*,'(A)',advance='no') 'Preorden: '
+        if (root .eq. 0) then
+          print *; return
+        endif
+        top=1; stack(top)=root
+        do while (top .gt. 0)
+          v=stack(top); top=top-1
+          write(*,'(I0,1X)',advance='no') key(v)
+          if (right(v) .ne. 0) then
+            top=top+1; stack(top)=right(v)
+          endif
+          if (left(v) .ne. 0) then
+            top=top+1; stack(top)=left(v)
+          endif
+        end do
+        print *
+      end subroutine
+      subroutine print_in(root, key, left, right)
+        integer root, key(*), left(*), right(*)
+        integer stack(200), top, cur
+        write(*,'(A)',advance='no') 'Inorden: '
+        top=0; cur=root
+        do while (cur .ne. 0 .or. top .gt. 0)
+          if (cur .ne. 0) then
+            top=top+1; stack(top)=cur
+            cur=left(cur)
+          else
+            cur=stack(top); top=top-1
+            write(*,'(I0,1X)',advance='no') key(cur)
+            cur=right(cur)
+          endif
+        end do
+        print *
+      end subroutine
+      subroutine print_post(root, key, left, right)
+        integer root, key(*), left(*), right(*)
+        integer s1(200), s2(200), t1, t2, v
+        write(*,'(A)',advance='no') 'Postorden: '
+        if (root .eq. 0) then
+          print *; return
+        endif
+        t1=1; s1(t1)=root; t2=0
+        do while (t1 .gt. 0)
+          v=s1(t1); t1=t1-1
+          t2=t2+1; s2(t2)=v
+          if (left(v) .ne. 0) then
+            t1=t1+1; s1(t1)=left(v)
+          endif
+          if (right(v) .ne. 0) then
+            t1=t1+1; s1(t1)=right(v)
+          endif
+        end do
+        do while (t2 .gt. 0)
+          v=s2(t2); t2=t2-1
+          write(*,'(I0,1X)',advance='no') key(v)
+        end do
+        print *
+      end subroutine
+      end program arbol_abb
+
